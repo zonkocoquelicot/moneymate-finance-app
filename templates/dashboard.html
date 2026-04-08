@@ -1,0 +1,239 @@
+{% extends "base.html" %}
+
+{% block title %}Dashboard - MoneyMate{% endblock %}
+
+{% block content %}
+<div class="row mb-4">
+    <div class="col-12">
+        <h1 class="text-white mb-2 fw-bold">
+            <i class="bi bi-speedometer2"></i> Dashboard
+        </h1>
+        <p class="text-white opacity-75">Track your finances at a glance</p>
+    </div>
+</div>
+
+<!-- Quick Stats -->
+<div class="row g-4 mb-4">
+    <div class="col-md-3 col-sm-6">
+        <a href="/income" class="text-decoration-none">
+            <div class="stat-card">
+                <div class="stat-icon icon-income">
+                    <i class="bi bi-arrow-down-circle"></i>
+                </div>
+                <div class="stat-value text-success">₹{{ "%.2f"|format(total_income) }}</div>
+                <div class="stat-label">Total Income</div>
+                <small class="text-muted"><i class="bi bi-pencil"></i> Click to manage</small>
+            </div>
+        </a>
+    </div>
+    <div class="col-md-3 col-sm-6">
+        <a href="/expenses" class="text-decoration-none">
+            <div class="stat-card">
+                <div class="stat-icon icon-expense">
+                    <i class="bi bi-arrow-up-circle"></i>
+                </div>
+                <div class="stat-value text-danger">₹{{ "%.2f"|format(total_expenses) }}</div>
+                <div class="stat-label">Total Expenses</div>
+                <small class="text-muted"><i class="bi bi-pencil"></i> Click to manage</small>
+            </div>
+        </a>
+    </div>
+    <div class="col-md-3 col-sm-6">
+        <div class="stat-card">
+            <div class="stat-icon icon-balance">
+                <i class="bi bi-wallet2"></i>
+            </div>
+            <div class="stat-value {% if balance >= 0 %}text-primary{% else %}text-danger{% endif %}">
+                ₹{{ "%.2f"|format(balance) }}
+            </div>
+            <div class="stat-label">Current Balance</div>
+            <small class="text-muted">Auto-calculated</small>
+        </div>
+    </div>
+    <div class="col-md-3 col-sm-6">
+        <a href="/goals" class="text-decoration-none">
+            <div class="stat-card">
+                <div class="stat-icon icon-goal">
+                    <i class="bi bi-trophy"></i>
+                </div>
+                <div class="stat-value text-warning">{{ goals|length }}</div>
+                <div class="stat-label">Active Goals</div>
+                <small class="text-muted"><i class="bi bi-pencil"></i> Click to manage</small>
+            </div>
+        </a>
+    </div>
+</div>
+
+<!-- Quick Actions -->
+<div class="row mb-4">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-body p-4">
+                <h5 class="mb-3 fw-bold">
+                    <i class="bi bi-lightning-charge"></i> Quick Actions
+                </h5>
+                <div class="row g-3">
+                    <div class="col-md-3 col-sm-6">
+                        <a href="/add-expense" class="btn btn-danger w-100 py-3">
+                            <i class="bi bi-plus-circle"></i> Add Expense
+                        </a>
+                    </div>
+                    <div class="col-md-3 col-sm-6">
+                        <a href="/add-income" class="btn btn-success w-100 py-3">
+                            <i class="bi bi-plus-circle"></i> Add Income
+                        </a>
+                    </div>
+                    <div class="col-md-3 col-sm-6">
+                        <a href="/budget" class="btn btn-primary w-100 py-3">
+                            <i class="bi bi-pie-chart"></i> Set Budget
+                        </a>
+                    </div>
+                    <div class="col-md-3 col-sm-6">
+                        <a href="/goals" class="btn btn-warning w-100 py-3">
+                            <i class="bi bi-trophy"></i> Manage Goals
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row g-4">
+    <!-- Category Breakdown -->
+    <div class="col-lg-6 mb-4">
+        <div class="card h-100">
+            <div class="card-header">
+                <i class="bi bi-pie-chart"></i> Spending by Category
+            </div>
+            <div class="card-body">
+                {% if category_totals %}
+                <canvas id="categoryChart" height="250"></canvas>
+                {% else %}
+                <div class="text-center py-5 text-muted">
+                    <i class="bi bi-inbox" style="font-size: 4rem;"></i>
+                    <p class="mt-3">No expenses yet</p>
+                    <a href="/add-expense" class="btn btn-primary">Add First Expense</a>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <!-- Recent Transactions -->
+    <div class="col-lg-6 mb-4">
+        <div class="card h-100">
+            <div class="card-header d-flex justify-content-between">
+                <span><i class="bi bi-clock-history"></i> Recent Transactions</span>
+                <a href="/expenses" class="text-white text-decoration-none">View All</a>
+            </div>
+            <div class="card-body">
+                {% if recent_expenses %}
+                <div class="list-group list-group-flush">
+                    {% for expense in recent_expenses %}
+                    <div class="list-group-item d-flex justify-content-between align-items-center border-0 py-3">
+                        <div>
+                            <h6 class="mb-1">{{ expense.category }}</h6>
+                            <small class="text-muted">{{ expense.description or 'No description' }}</small><br>
+                            <small class="text-muted">{{ expense.date.strftime('%b %d, %Y') }}</small>
+                        </div>
+                        <h5 class="text-danger mb-0">-₹{{ "%.2f"|format(expense.amount) }}</h5>
+                    </div>
+                    {% endfor %}
+                </div>
+                {% else %}
+                <div class="text-center py-5 text-muted">
+                    <i class="bi bi-receipt" style="font-size: 4rem;"></i>
+                    <p class="mt-3">No transactions yet</p>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <!-- Savings Goals Progress -->
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <span><i class="bi bi-trophy"></i> Savings Goals</span>
+                <a href="/goals" class="text-white text-decoration-none">Manage Goals</a>
+            </div>
+            <div class="card-body">
+                {% if goals %}
+                    <div class="row g-3">
+                        {% for goal in goals %}
+                        <div class="col-md-6">
+                            <div class="border rounded p-3">
+                                <h6 class="mb-2">{{ goal.goal_name }}</h6>
+                                <div class="progress mb-2" style="height: 20px;">
+                                    <div class="progress-bar bg-success" style="width: {{ (goal.current_amount / goal.target_amount * 100) if goal.target_amount > 0 else 0 }}%">
+                                        {{ "%.0f"|format((goal.current_amount / goal.target_amount * 100) if goal.target_amount > 0 else 0) }}%
+                                    </div>
+                                </div>
+                                <div class="d-flex justify-content-between small text-muted">
+                                    <span>₹{{ "%.2f"|format(goal.current_amount) }} / ₹{{ "%.2f"|format(goal.target_amount) }}</span>
+                                    {% if goal.deadline %}
+                                    <span><i class="bi bi-calendar"></i> {{ goal.deadline.strftime('%b %d, %Y') }}</span>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                {% else %}
+                    <div class="text-center py-4 text-muted">
+                        <i class="bi bi-trophy" style="font-size: 4rem;"></i>
+                        <p class="mt-3">No savings goals set yet</p>
+                        <a href="/goals" class="btn btn-primary">Create Your First Goal</a>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+// Category Pie Chart
+{% if category_totals %}
+const categoryCtx = document.getElementById('categoryChart');
+if (categoryCtx) {
+    new Chart(categoryCtx, {
+        type: 'doughnut',
+        data: {
+            labels: {{ category_totals.keys()|list|tojson }},
+            datasets: [{
+                data: {{ category_totals.values()|list|tojson }},
+                backgroundColor: [
+                    '#f59e0b', '#3b82f6', '#ec4899', '#8b5cf6',
+                    '#ef4444', '#10b981', '#06b6d4', '#64748b'
+                ],
+                borderWidth: 0
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: true,
+            plugins: {
+                legend: {
+                    position: 'bottom',
+                    labels: {
+                        padding: 15,
+                        font: { size: 12 }
+                    }
+                },
+                tooltip: {
+                    callbacks: {
+                        label: function(context) {
+                            return context.label + ': ₹' + context.parsed.toFixed(2);
+                        }
+                    }
+                }
+            }
+        }
+    });
+}
+{% endif %}
+</script>
+{% endblock %}

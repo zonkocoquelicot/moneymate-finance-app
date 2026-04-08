@@ -1,0 +1,71 @@
+{% extends "base.html" %}
+
+{% block title %}Add Income - MoneyMate{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-lg-6 mx-auto">
+        <div class="card">
+            <div class="card-header">
+                <i class="bi bi-plus-circle"></i> Add New Income
+            </div>
+            <div class="card-body p-4">
+                <form method="POST" action="/add-income">
+                    <div class="mb-4">
+                        <label class="form-label fw-bold">
+                            <i class="bi bi-currency-rupee"></i> Amount *
+                        </label>
+                        <input type="number" class="form-control form-control-lg" 
+                               name="amount" placeholder="0.00" step="0.01" min="0.01" required autofocus>
+                    </div>
+
+                    <div class="mb-4">
+                        <label class="form-label fw-bold">
+                            <i class="bi bi-briefcase"></i> Source *
+                        </label>
+                        <select class="form-select form-select-lg" name="source" required>
+                            <option value="">Choose source...</option>
+                            <option value="Salary">💼 Salary</option>
+                            <option value="Freelance">💻 Freelance</option>
+                            <option value="Part-time Job">⏰ Part-time Job</option>
+                            <option value="Business">🏢 Business</option>
+                            <option value="Investment">📈 Investment</option>
+                            <option value="Gift">🎁 Gift</option>
+                            <option value="Scholarship">🎓 Scholarship</option>
+                            <option value="Other">💰 Other</option>
+                        </select>
+                    </div>
+
+                    <div class="mb-4">
+                        <label class="form-label fw-bold">
+                            <i class="bi bi-chat-left-text"></i> Description
+                        </label>
+                        <textarea class="form-control" name="description" rows="3" 
+                                  placeholder="Add notes about this income (optional)"></textarea>
+                    </div>
+
+                    <div class="mb-4">
+                        <label class="form-label fw-bold">
+                            <i class="bi bi-calendar"></i> Date *
+                        </label>
+                        <input type="date" class="form-control" name="date" required>
+                    </div>
+
+                    <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                        <a href="/dashboard" class="btn btn-outline-secondary px-4">
+                            <i class="bi bi-x-circle"></i> Cancel
+                        </a>
+                        <button type="submit" class="btn btn-success px-4">
+                            <i class="bi bi-check-circle"></i> Save Income
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+document.querySelector('input[name="date"]').valueAsDate = new Date();
+</script>
+{% endblock %}

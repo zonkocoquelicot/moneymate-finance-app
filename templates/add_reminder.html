@@ -1,0 +1,67 @@
+{% extends "base.html" %}
+
+{% block title %}Add Bill Reminder - MoneyMate{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-lg-6 mx-auto">
+        <div class="card">
+            <div class="card-header">
+                <i class="bi bi-bell"></i> Add Bill Reminder
+            </div>
+            <div class="card-body p-4">
+                <form method="POST" action="/add-reminder">
+                    <div class="mb-4">
+                        <label class="form-label fw-bold">
+                            <i class="bi bi-receipt"></i> Bill Name *
+                        </label>
+                        <input type="text" class="form-control form-control-lg" 
+                               name="bill_name" placeholder="e.g., Electricity Bill" required>
+                    </div>
+
+                    <div class="mb-4">
+                        <label class="form-label fw-bold">
+                            <i class="bi bi-currency-rupee"></i> Amount *
+                        </label>
+                        <input type="number" class="form-control form-control-lg" 
+                               name="amount" placeholder="0.00" step="0.01" min="0.01" required>
+                    </div>
+
+                    <div class="mb-4">
+                        <label class="form-label fw-bold">
+                            <i class="bi bi-tag"></i> Category
+                        </label>
+                        <select class="form-select" name="category">
+                            <option value="Bills">📄 Bills & Utilities</option>
+                            <option value="Health">💊 Health Insurance</option>
+                            <option value="Education">📚 Education Fees</option>
+                            <option value="Other">📦 Other</option>
+                        </select>
+                    </div>
+
+                    <div class="mb-4">
+                        <label class="form-label fw-bold">
+                            <i class="bi bi-calendar"></i> Due Date *
+                        </label>
+                        <input type="date" class="form-control" name="due_date" required>
+                    </div>
+
+                    <div class="alert alert-info">
+                        <i class="bi bi-info-circle"></i>
+                        You'll be reminded before the due date!
+                    </div>
+
+                    <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                        <a href="/reminders" class="btn btn-outline-secondary px-4">
+                            <i class="bi bi-x-circle"></i> Cancel
+                        </a>
+                        <button type="submit" class="btn btn-primary px-4">
+                            <i class="bi bi-check-circle"></i> Save Reminder
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

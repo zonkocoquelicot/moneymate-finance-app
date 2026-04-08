@@ -1,0 +1,83 @@
+{% extends "base.html" %}
+
+{% block title %}Add Recurring Expense - MoneyMate{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-lg-6 mx-auto">
+        <div class="card">
+            <div class="card-header">
+                <i class="bi bi-arrow-repeat"></i> Add Recurring Expense
+            </div>
+            <div class="card-body p-4">
+                <form method="POST" action="/add-recurring">
+                    <div class="mb-4">
+                        <label class="form-label fw-bold">
+                            <i class="bi bi-currency-rupee"></i> Amount *
+                        </label>
+                        <input type="number" class="form-control form-control-lg" 
+                               name="amount" placeholder="0.00" step="0.01" min="0.01" required>
+                    </div>
+
+                    <div class="mb-4">
+                        <label class="form-label fw-bold">
+                            <i class="bi bi-tag"></i> Category *
+                        </label>
+                        <select class="form-select form-select-lg" name="category" required>
+                            <option value="">Choose category...</option>
+                            <option value="Food">🍔 Food & Dining</option>
+                            <option value="Transport">🚗 Transportation</option>
+                            <option value="Entertainment">🎮 Entertainment</option>
+                            <option value="Shopping">🛍️ Shopping</option>
+                            <option value="Bills">📄 Bills & Utilities</option>
+                            <option value="Health">💊 Health & Fitness</option>
+                            <option value="Education">📚 Education</option>
+                            <option value="Other">📦 Other</option>
+                        </select>
+                    </div>
+
+                    <div class="mb-4">
+                        <label class="form-label fw-bold">
+                            <i class="bi bi-chat-left-text"></i> Description *
+                        </label>
+                        <input type="text" class="form-control" name="description" 
+                               placeholder="e.g., Netflix Subscription" required>
+                    </div>
+
+                    <div class="mb-4">
+                        <label class="form-label fw-bold">
+                            <i class="bi bi-clock"></i> Frequency *
+                        </label>
+                        <select class="form-select" name="frequency" required>
+                            <option value="">Choose frequency...</option>
+                            <option value="daily">📅 Daily</option>
+                            <option value="weekly">📆 Weekly</option>
+                            <option value="monthly">📊 Monthly</option>
+                        </select>
+                    </div>
+
+                    <div class="mb-4">
+                        <label class="form-label fw-bold">
+                            <i class="bi bi-calendar"></i> Start Date *
+                        </label>
+                        <input type="date" class="form-control" name="start_date" required>
+                    </div>
+
+                    <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                        <a href="/recurring" class="btn btn-outline-secondary px-4">
+                            <i class="bi bi-x-circle"></i> Cancel
+                        </a>
+                        <button type="submit" class="btn btn-primary px-4">
+                            <i class="bi bi-check-circle"></i> Save Recurring Expense
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+document.querySelector('input[name="start_date"]').valueAsDate = new Date();
+</script>
+{% endblock %}

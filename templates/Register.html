@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Register – MoneyMate</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      background: #f0f4f8;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .card {
+      background: #fff;
+      border-radius: 16px;
+      box-shadow: 0 4px 24px rgba(0,0,0,0.10);
+      padding: 40px 36px;
+      width: 100%;
+      max-width: 420px;
+    }
+    .logo {
+      text-align: center;
+      margin-bottom: 28px;
+    }
+    .logo h1 { font-size: 26px; color: #1a73e8; font-weight: 700; }
+    .logo p  { color: #666; font-size: 14px; margin-top: 4px; }
+    label {
+      display: block;
+      font-size: 13px;
+      font-weight: 600;
+      color: #444;
+      margin-bottom: 6px;
+    }
+    input {
+      width: 100%;
+      padding: 11px 14px;
+      border: 1.5px solid #dde3ec;
+      border-radius: 8px;
+      font-size: 15px;
+      margin-bottom: 18px;
+      transition: border-color .2s;
+      outline: none;
+    }
+    input:focus { border-color: #1a73e8; }
+    .error {
+      background: #fff0f0;
+      border: 1px solid #f5c2c2;
+      color: #c0392b;
+      border-radius: 8px;
+      padding: 10px 14px;
+      font-size: 13px;
+      margin-bottom: 18px;
+    }
+    .hint {
+      font-size: 12px;
+      color: #888;
+      margin-top: -12px;
+      margin-bottom: 16px;
+    }
+    .btn {
+      width: 100%;
+      padding: 12px;
+      background: #27ae60;
+      color: #fff;
+      border: none;
+      border-radius: 8px;
+      font-size: 16px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background .2s;
+    }
+    .btn:hover { background: #1e8449; }
+    .footer-link {
+      text-align: center;
+      margin-top: 20px;
+      font-size: 14px;
+      color: #555;
+    }
+    .footer-link a { color: #1a73e8; text-decoration: none; font-weight: 600; }
+    .footer-link a:hover { text-decoration: underline; }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <div class="logo">
+      <h1>💰 MoneyMate</h1>
+      <p>Create your free account</p>
+    </div>
+
+    {% if error %}
+      <div class="error">⚠️ {{ error }}</div>
+    {% endif %}
+
+    <form method="POST">
+      <label for="username">Username</label>
+      <input type="text" id="username" name="username"
+             placeholder="e.g. nimisha123" required autofocus
+             minlength="3" maxlength="80">
+
+      <label for="email">Email address</label>
+      <input type="email" id="email" name="email"
+             placeholder="you@example.com" required>
+
+      <label for="password">Password</label>
+      <input type="password" id="password" name="password"
+             placeholder="Choose a strong password" required minlength="6">
+      <p class="hint">Minimum 6 characters</p>
+
+      <button type="submit" class="btn">Create account</button>
+    </form>
+
+    <div class="footer-link">
+      Already have an account? <a href="{{ url_for('login') }}">Sign in</a>
+    </div>
+  </div>
+</body>
+</html>

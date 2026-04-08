@@ -1,0 +1,82 @@
+{% extends "base.html" %}
+
+{% block title %}Bill Reminders - MoneyMate{% endblock %}
+
+{% block content %}
+<div class="row mb-4">
+    <div class="col-12">
+        <h1 class="text-white mb-2 fw-bold">
+            <i class="bi bi-bell"></i> Bill Reminders
+        </h1>
+        <p class="text-white opacity-75">Never miss a bill payment</p>
+    </div>
+</div>
+
+<div class="card">
+    <div class="card-header d-flex justify-content-between align-items-center">
+        <span>Upcoming Bills</span>
+        <a href="/add-reminder" class="btn btn-light btn-sm">
+            <i class="bi bi-plus-circle"></i> Add Reminder
+        </a>
+    </div>
+    <div class="card-body">
+        {% if reminders %}
+        <div class="row g-3">
+            {% for reminder in reminders %}
+            <div class="col-md-6">
+                <div class="card {% if (reminder.due_date - reminder.due_date.today()).days <= 3 %}border-danger{% elif (reminder.due_date - reminder.due_date.today()).days <= 7 %}border-warning{% endif %}">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between align-items-start mb-2">
+                            <h5 class="mb-0">{{ reminder.bill_name }}</h5>
+                            <span class="badge {% if (reminder.due_date - reminder.due_date.today()).days <= 3 %}bg-danger{% elif (reminder.due_date - reminder.due_date.today()).days <= 7 %}bg-warning{% else %}bg-success{% endif %}">
+                                Due: {{ reminder.due_date.strftime('%b %d') }}
+                            </span>
+                        </div>
+                        <p class="text-muted mb-2">
+                            <i class="bi bi-tag"></i> {{ reminder.category }}
+                        </p>
+                        <h4 class="text-primary mb-3">₹{{ "%.2f"|format(reminder.amount) }}</h4>
+                        <button class="btn btn-sm btn-success" onclick="markPaid({{ reminder.id }})">
+                            <i class="bi bi-check-circle"></i> Mark as Paid
+                        </button>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        {% else %}
+        <div class="text-center py-5 text-muted">
+            <i class="bi bi-bell" style="font-size: 5rem;"></i>
+            <h5 class="mt-3">No upcoming bill reminders</h5>
+            <p>Add bill reminders to stay on top of your payments</p>
+            <a href="/add-reminder" class="btn btn-primary mt-2">
+                <i class="bi bi-plus-circle"></i> Add First Reminder
+            </a>
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+async function markPaid(reminderId) {
+    if (!confirm('Mark this bill as paid? This will create an expense entry.')) return;
+    
+    try {
+        const response = await fetch(`/api/mark-paid/${reminderId}`, {
+            method: 'POST'
+        });
+        
+        const data = await response.json();
+        
+        if (data.success) {
+            alert('Bill marked as paid!');
+            location.reload();
+        }
+    } catch (error) {
+        alert('Error: ' + error.message);
+    }
+}
+</script>
+{% endblock %}

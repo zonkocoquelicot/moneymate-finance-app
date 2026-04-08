@@ -1,0 +1,107 @@
+{% extends "base.html" %}
+
+{% block title %}Recurring Expenses - MoneyMate{% endblock %}
+
+{% block content %}
+<div class="row mb-4">
+    <div class="col-12">
+        <h1 class="text-white mb-2 fw-bold">
+            <i class="bi bi-arrow-repeat"></i> Recurring Expenses
+        </h1>
+        <p class="text-white opacity-75">Manage your automatic recurring expenses</p>
+    </div>
+</div>
+
+<div class="card mb-4">
+    <div class="card-header d-flex justify-content-between align-items-center">
+        <span>Active Recurring Expenses</span>
+        <div>
+            <button class="btn btn-success btn-sm me-2" onclick="processRecurring()">
+                <i class="bi bi-play-circle"></i> Process Due Expenses
+            </button>
+            <a href="/add-recurring" class="btn btn-light btn-sm">
+                <i class="bi bi-plus-circle"></i> Add New
+            </a>
+        </div>
+    </div>
+    <div class="card-body">
+        {% if recurring_expenses %}
+        <div class="table-responsive">
+            <table class="table table-hover">
+                <thead class="table-light">
+                    <tr>
+                        <th>Description</th>
+                        <th>Category</th>
+                        <th>Amount</th>
+                        <th>Frequency</th>
+                        <th>Next Date</th>
+                        <th>Status</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for recurring in recurring_expenses %}
+                    <tr>
+                        <td>{{ recurring.description }}</td>
+                        <td><span class="badge bg-primary">{{ recurring.category }}</span></td>
+                        <td class="fw-bold">₹{{ "%.2f"|format(recurring.amount) }}</td>
+                        <td>
+                            <span class="badge bg-info">
+                                {{ recurring.frequency|capitalize }}
+                            </span>
+                        </td>
+                        <td>{{ recurring.next_date.strftime('%b %d, %Y') }}</td>
+                        <td>
+                            {% if recurring.active %}
+                            <span class="badge bg-success">Active</span>
+                            {% else %}
+                            <span class="badge bg-secondary">Inactive</span>
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% else %}
+        <div class="text-center py-5 text-muted">
+            <i class="bi bi-arrow-repeat" style="font-size: 5rem;"></i>
+            <h5 class="mt-3">No recurring expenses set</h5>
+            <p>Add recurring expenses like rent, subscriptions, or monthly bills</p>
+            <a href="/add-recurring" class="btn btn-primary mt-2">
+                <i class="bi bi-plus-circle"></i> Add First Recurring Expense
+            </a>
+        </div>
+        {% endif %}
+    </div>
+</div>
+
+<div class="alert alert-info">
+    <i class="bi bi-info-circle"></i>
+    <strong>How it works:</strong> Recurring expenses are automatically created on their due dates. 
+    Click "Process Due Expenses" to create expense entries for any overdue recurring expenses.
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+async function processRecurring() {
+    if (!confirm('Process all due recurring expenses?')) return;
+    
+    try {
+        const response = await fetch('/api/process-recurring', {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'}
+        });
+        
+        const data = await response.json();
+        
+        if (data.success) {
+            alert(`Processed ${data.processed} recurring expense(s)!`);
+            location.reload();
+        }
+    } catch (error) {
+        alert('Error: ' + error.message);
+    }
+}
+</script>
+{% endblock %}

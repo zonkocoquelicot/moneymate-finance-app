@@ -1,0 +1,138 @@
+{% extends "base.html" %}
+
+{% block title %}Currency Converter - MoneyMate{% endblock %}
+
+{% block content %}
+<div class="row mb-4">
+    <div class="col-12">
+        <h1 class="text-white mb-2 fw-bold">
+            <i class="bi bi-currency-exchange"></i> Currency Converter
+        </h1>
+        <p class="text-white opacity-75">Convert between different currencies</p>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-lg-6 mx-auto">
+        <div class="card">
+            <div class="card-header">
+                <i class="bi bi-calculator"></i> Convert Currency
+            </div>
+            <div class="card-body p-4">
+                <div class="mb-4">
+                    <label class="form-label fw-bold">Amount</label>
+                    <input type="number" class="form-control form-control-lg" 
+                           id="amount" placeholder="0.00" step="0.01" min="0" value="100">
+                </div>
+
+                <div class="row mb-4">
+                    <div class="col-md-6">
+                        <label class="form-label fw-bold">From</label>
+                        <select class="form-select form-select-lg" id="fromCurrency">
+                            {% for currency in currencies %}
+                            <option value="{{ currency }}" {% if currency == 'INR' %}selected{% endif %}>
+                                {{ currency }}
+                            </option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label fw-bold">To</label>
+                        <select class="form-select form-select-lg" id="toCurrency">
+                            {% for currency in currencies %}
+                            <option value="{{ currency }}" {% if currency == 'USD' %}selected{% endif %}>
+                                {{ currency }}
+                            </option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                </div>
+
+                <button class="btn btn-primary w-100 btn-lg mb-4" onclick="convertCurrency()">
+                    <i class="bi bi-arrow-left-right"></i> Convert
+                </button>
+
+                <div id="result" class="alert alert-success" style="display: none;">
+                    <h4 class="mb-0">Result: <span id="convertedAmount"></span></h4>
+                    <small class="text-muted">Exchange rate: <span id="rate"></span></small>
+                </div>
+            </div>
+        </div>
+
+        <div class="card mt-4">
+            <div class="card-header">
+                <i class="bi bi-info-circle"></i> Supported Currencies
+            </div>
+            <div class="card-body">
+                <div class="row g-2">
+                    <div class="col-6 col-md-4">
+                        <span class="badge bg-primary w-100">INR - Indian Rupee</span>
+                    </div>
+                    <div class="col-6 col-md-4">
+                        <span class="badge bg-success w-100">USD - US Dollar</span>
+                    </div>
+                    <div class="col-6 col-md-4">
+                        <span class="badge bg-info w-100">EUR - Euro</span>
+                    </div>
+                    <div class="col-6 col-md-4">
+                        <span class="badge bg-warning w-100">GBP - British Pound</span>
+                    </div>
+                    <div class="col-6 col-md-4">
+                        <span class="badge bg-danger w-100">JPY - Japanese Yen</span>
+                    </div>
+                    <div class="col-6 col-md-4">
+                        <span class="badge bg-secondary w-100">AED - UAE Dirham</span>
+                    </div>
+                    <div class="col-6 col-md-4">
+                        <span class="badge bg-dark w-100">SGD - Singapore Dollar</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+async function convertCurrency() {
+    const amount = parseFloat(document.getElementById('amount').value);
+    const from = document.getElementById('fromCurrency').value;
+    const to = document.getElementById('toCurrency').value;
+    
+    if (!amount || amount <= 0) {
+        alert('Please enter a valid amount');
+        return;
+    }
+    
+    try {
+        const response = await fetch('/api/convert-currency', {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({
+                amount: amount,
+                from: from,
+                to: to
+            })
+        });
+        
+        const data = await response.json();
+        
+        if (data.success) {
+            document.getElementById('convertedAmount').textContent = 
+                `${data.converted} ${data.to}`;
+            document.getElementById('rate').textContent = 
+                `1 ${data.from} = ${data.rate} ${data.to}`;
+            document.getElementById('result').style.display = 'block';
+        }
+    } catch (error) {
+        alert('Error: ' + error.message);
+    }
+}
+
+// Convert on page load
+window.onload = function() {
+    convertCurrency();
+};
+</script>
+{% endblock %}

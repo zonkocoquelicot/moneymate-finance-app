@@ -1,0 +1,125 @@
+{% extends "base.html" %}
+
+{% block title %}Analytics - MoneyMate{% endblock %}
+
+{% block content %}
+<div class="row mb-4">
+    <div class="col-12">
+        <h1 class="text-white mb-2 fw-bold">
+            <i class="bi bi-graph-up"></i> Analytics
+        </h1>
+        <p class="text-white opacity-75">Visualize your financial trends</p>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-lg-12 mb-4">
+        <div class="card">
+            <div class="card-header">
+                <i class="bi bi-graph-up-arrow"></i> Income vs Expenses (Last 6 Months)
+            </div>
+            <div class="card-body">
+                {% if months_data %}
+                <canvas id="trendChart" height="80"></canvas>
+                {% else %}
+                <div class="text-center py-5 text-muted">
+                    <p>No data available yet</p>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <div class="col-lg-6 mb-4">
+        <div class="card">
+            <div class="card-header">
+                <i class="bi bi-pie-chart"></i> Category Breakdown
+            </div>
+            <div class="card-body">
+                {% if category_totals %}
+                <canvas id="categoryChart" height="200"></canvas>
+                {% else %}
+                <div class="text-center py-5 text-muted">
+                    <p>No expenses to analyze</p>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <div class="col-lg-6 mb-4">
+        <div class="card">
+            <div class="card-header">
+                <i class="bi bi-info-circle"></i> Quick Stats
+            </div>
+            <div class="card-body">
+                <div class="mb-3">
+                    <h6 class="text-muted">Average Monthly Expense</h6>
+                    <h3 class="text-danger">₹{{ "%.2f"|format((months_data|map(attribute='expenses')|sum / 6) if months_data else 0) }}</h3>
+                </div>
+                <div class="mb-3">
+                    <h6 class="text-muted">Average Monthly Income</h6>
+                    <h3 class="text-success">₹{{ "%.2f"|format((months_data|map(attribute='income')|sum / 6) if months_data else 0) }}</h3>
+                </div>
+                <div>
+                    <h6 class="text-muted">Top Spending Category</h6>
+                    <h3 class="text-primary">
+                        {% if category_totals %}
+                        {{ category_totals.keys()|list|first }}
+                        {% else %}
+                        N/A
+                        {% endif %}
+                    </h3>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+{% if months_data %}
+const trendCtx = document.getElementById('trendChart');
+new Chart(trendCtx, {
+    type: 'line',
+    data: {
+        labels: {{ months_data|map(attribute='month')|list|tojson }},
+        datasets: [{
+            label: 'Expenses',
+            data: {{ months_data|map(attribute='expenses')|list|tojson }},
+            borderColor: '#ef4444',
+            backgroundColor: 'rgba(239, 68, 68, 0.1)',
+            tension: 0.4
+        }, {
+            label: 'Income',
+            data: {{ months_data|map(attribute='income')|list|tojson }},
+            borderColor: '#10b981',
+            backgroundColor: 'rgba(16, 185, 129, 0.1)',
+            tension: 0.4
+        }]
+    },
+    options: {
+        responsive: true,
+        plugins: {
+            legend: { position: 'top' }
+        }
+    }
+});
+{% endif %}
+
+{% if category_totals %}
+const catCtx = document.getElementById('categoryChart');
+new Chart(catCtx, {
+    type: 'doughnut',
+    data: {
+        labels: {{ category_totals.keys()|list|tojson }},
+        datasets: [{
+            data: {{ category_totals.values()|list|tojson }},
+            backgroundColor: ['#f59e0b', '#3b82f6', '#ec4899', '#8b5cf6', '#ef4444', '#10b981', '#06b6d4', '#64748b']
+        }]
+    }
+});
+{% endif %}
+</script>
+{% endblock %}
